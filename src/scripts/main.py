@@ -5,15 +5,12 @@ from pyspark.sql import SparkSession
 from pyspark.sql import functions as F
 from pyspark.sql.types import StructType, StructField, StringType, LongType
 
-kafka_bootstrap_servers = 'rc1b-2erh7b35n4j4v869.mdb.yandexcloud.net:9091'
-
-kafka_user = 'Slavik0041'
-kafka_pass = 'password'
 
 kafka_security_options = {
     'kafka.security.protocol': 'SASL_SSL',
     'kafka.sasl.mechanism': 'SCRAM-SHA-512',
-    'kafka.sasl.jaas.config': f'org.apache.kafka.common.security.scram.ScramLoginModule required username="{kafka_user}" password="{kafka_pass}";',
+    'kafka.sasl.jaas.config': f'org.apache.kafka.common.security.scram.ScramLoginModule required username=\"Slavik0041\" password=\"password\";',
+    'kafka.bootstrap.servers': 'rc1b-2erh7b35n4j4v869.mdb.yandexcloud.net:9091',
 }
 
 docker_postgresql_settings = {
@@ -21,7 +18,7 @@ docker_postgresql_settings = {
     'password': 'jovyan',
     'url': f'jdbc:postgresql://localhost:5432/postgres',
     'driver': 'org.postgresql.Driver',
-    'dbtable': 'public.subscribers_feedback',
+    'dbtable': 'public.create_subscribers_feedback',
 }
 
 postgresql_settings = {
@@ -40,8 +37,8 @@ spark_jars_packages = ",".join(
     ]
 )
 
-TOPIC_NAME_IN = 'Slavik0041_in'
-TOPIC_NAME_OUT = 'Slavik0041_out'
+TOPIC_NAME_IN = 'student.topic.cohort9.Slavik0041_in'
+TOPIC_NAME_OUT = 'student.topic.cohort9.Slavik0041_out'
 
 # текущее время в миллисекундах
 current_timestamp_utc = int(round(datetime.utcnow().timestamp()))
@@ -155,23 +152,6 @@ def subscribers_restaurants(spark):
     df = df.dropDuplicates(['client_id', 'restaurant_id'])
     return df
 
-
-#       "+---+--------------------+--------------------+\n",
-#       "| id|           client_id|       restaurant_id|\n",
-#       "+---+--------------------+--------------------+\n",
-#       "|  1|223e4567-e89b-12d...|123e4567-e89b-12d...|\n",
-#       "|  2|323e4567-e89b-12d...|123e4567-e89b-12d...|\n",
-#       "|  3|423e4567-e89b-12d...|123e4567-e89b-12d...|\n",
-#       "|  4|523e4567-e89b-12d...|123e4567-e89b-12d...|\n",
-#       "|  5|623e4567-e89b-12d...|123e4567-e89b-12d...|\n",
-#       "|  6|723e4567-e89b-12d...|123e4567-e89b-12d...|\n",
-#       "|  7|823e4567-e89b-12d...|123e4567-e89b-12d...|\n",
-#       "|  8|923e4567-e89b-12d...|123e4567-e89b-12d...|\n",
-#       "|  9|923e4567-e89b-12d...|123e4567-e89b-12d...|\n",
-#       "| 10|023e4567-e89b-12d...|123e4567-e89b-12d...|\n",
-#       "+---+--------------------+--------------------+\n",
-
-# джойним данные из сообщения Kafka с пользователями подписки по restaurant_id (uuid). Добавляем время создания события.
 
 def join(restaurant_read_stream_df, subscribers_restaurant_df):
     df = restaurant_read_stream_df \
